@@ -9,6 +9,7 @@ from PIL import Image
 
 THUMBNAIL_SIZE = (150, 150)
 STANDARD_SIZE = (2000, 2000)
+S3_BUCKET = 'drone-part-picker-jtcruthers'
 
 ImageData = namedtuple('POSTData', ['name', 'id', 'image'])
 
@@ -42,20 +43,40 @@ def create_file_name(image_data, size):
     return re.sub(r'\s', '_', base_name)
 
 
+def get_s3_client():
+    return boto3.client('s3')
+
+
+def upload_to_s3(file_name, file_path):
+    s3_client = get_s3_client()
+    s3_client.upload_file(
+        file_path,
+        S3_BUCKET,
+        file_name
+    )
+
+
 def create_thumbnail(image_data):
     file_name = create_file_name(image_data, 'thumb')
+    file_path = f'/tmp/{file_name}'
     image = image_data.image
     image.thumbnail(THUMBNAIL_SIZE)
-    image.save(f'/Users/justin.carruthers/Desktop/{file_name}')
-    print(f'SAVING THUMBNAIL {file_name}')
+    image.save(file_path)
+    print(f'SAVING THUMBNAIL {file_path}')
+    upload_to_s3(file_name, file_path)
+    print(f'UPLOADING THUMBNAIL')
+    return file_name
 
 
 def create_standard_view(image_data):
     file_name = create_file_name(image_data, 'standard')
+    file_path = f'/tmp/{file_name}'
     image = image_data.image
     image.thumbnail(STANDARD_SIZE)
-    image.save(f'/Users/justin.carruthers/Desktop/{file_name}')
-    print(f'SAVING STANDARD VIEW {file_name}')
+    image.save(file_path)
+    print(f'SAVING STANDARD VIEW {file_path}')
+    upload_to_s3(file_name, file_path)
+    print(f'UPLOADING STANDARD VIEW')
     return file_name
 
 
