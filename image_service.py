@@ -49,10 +49,12 @@ def get_s3_client():
 
 def upload_to_s3(file_name, file_path):
     s3_client = get_s3_client()
+    extra_args = { 'ContentType': 'image/jpeg' }
     s3_client.upload_file(
         file_path,
         S3_BUCKET,
-        file_name
+        file_name,
+        extra_args 
     )
 
 
