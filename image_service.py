@@ -1,23 +1,39 @@
 import boto3
 import json
 import re
+import requests
 from collections import namedtuple
+from uuid import uuid4
 
 from PIL import Image
 
 THUMBNAIL_SIZE = (150, 150)
 STANDARD_SIZE = (2000, 2000)
 
-ImageData = namedtuple('ImageData', ['name', 'id', 'image'])
+ImageData = namedtuple('POSTData', ['name', 'id', 'image'])
+
+
+def load_image(image_url):
+    tmp_file_path = f'/tmp/{uuid4().hex}'
+    r = requests.get(image_url)
+    if r.status_code < 200 or r.status_code > 299:
+        raise Exception(f"Couldn't load image url {image_url}")
+
+    with open(tmp_file_path, 'wb') as file_:
+        for chunk in r:
+            file_.write(chunk)
+
+    print(f'Stored image from {image_url} to {tmp_file_path}')
+    return Image.open(tmp_file_path)
 
 
 def parse_event(event):
     body = json.loads(event['body'])
-    #image = Image.open(body['image'])
+    image = load_image(body['image_url'])
     return ImageData(
-        body['name'],
-        body['id'],
-        body['image_url']
+        name=body['name'],
+        id=body['id'],
+        image=image
     )
 
 
@@ -28,27 +44,26 @@ def create_file_name(image_data, size):
 
 def create_thumbnail(image_data):
     file_name = create_file_name(image_data, 'thumb')
-    #image = image_data.image
-    #image.thumbnail(THUMBNAIL_SIZE)
-    #image.save(f'/Users/justin.carruthers/Desktop/{file_name}')
+    image = image_data.image
+    image.thumbnail(THUMBNAIL_SIZE)
+    image.save(f'/Users/justin.carruthers/Desktop/{file_name}')
     print(f'SAVING THUMBNAIL {file_name}')
 
 
 def create_standard_view(image_data):
     file_name = create_file_name(image_data, 'standard')
-    #image = image_data.image
-    #image.thumbnail(STANDARD_SIZE)
-    #image.save(f'/Users/justin.carruthers/Desktop/{file_name}')
+    image = image_data.image
+    image.thumbnail(STANDARD_SIZE)
+    image.save(f'/Users/justin.carruthers/Desktop/{file_name}')
     print(f'SAVING STANDARD VIEW {file_name}')
     return file_name
 
 
 def lambda_handler(event, context):
-    print(f'EVENT: {event}')
     image_data = parse_event(event)
     standard_file_name = create_standard_view(image_data)
     create_thumbnail(image_data)
     return {
         'statusCode': 200,
-        'body': 'standard_file_name'
+        'body': standard_file_name
     }
