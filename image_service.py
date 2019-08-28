@@ -3,7 +3,6 @@ import json
 import re
 from collections import namedtuple
 
-print('Working?')
 from PIL import Image
 
 THUMBNAIL_SIZE = (150, 150)
@@ -53,20 +52,3 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': 'standard_file_name'
     }
-
-
-"""
-@app.route('/')
-def test():
-    request_image = request.files['image']
-    event = {
-        'body': {
-            'name': request.form['name'],
-            'alt': request.form['alt'],
-            'id': request.form['id'],
-            'image': request.files['image']
-        }
-    }
-    lambda_response = lambda_handler(event, None)
-    return f'Passed to lambda handler successfully {lambda_response["body"]}'
-"""
