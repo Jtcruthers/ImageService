@@ -2,7 +2,7 @@ import json
 
 import image_service
 
-def test():
+def test_jpg():
     event = {
         'body': json.dumps({
             'name': 'Urban Meyer',
@@ -13,5 +13,19 @@ def test():
     lambda_response = image_service.lambda_handler(event, None)
 
 
+def test_png():
+    event = {
+        'body': json.dumps({
+            'name': 'PNG Pic',
+            'id': 2,
+            'image_url': 'https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png'
+        })
+    }
+    lambda_response = image_service.lambda_handler(event, None)
+
+
 if __name__ == "__main__":
-    test()
+    print('\n\nTEST JPG\n')
+    test_jpg()
+    print('\n\nTEST PNG\n')
+    test_png()

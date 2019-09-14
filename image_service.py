@@ -63,7 +63,7 @@ def create_thumbnail(image_data):
     file_path = f'/tmp/{file_name}'
     image = image_data.image
     image.thumbnail(THUMBNAIL_SIZE)
-    image.save(file_path)
+    image.convert('RGB').save(file_path)
     print(f'SAVING THUMBNAIL {file_path}')
     upload_to_s3(file_name, file_path)
     print(f'UPLOADING THUMBNAIL')
@@ -75,7 +75,7 @@ def create_standard_view(image_data):
     file_path = f'/tmp/{file_name}'
     image = image_data.image
     image.thumbnail(STANDARD_SIZE)
-    image.save(file_path)
+    image.convert('RGB').save(file_path)
     print(f'SAVING STANDARD VIEW {file_path}')
     upload_to_s3(file_name, file_path)
     print(f'UPLOADING STANDARD VIEW')
