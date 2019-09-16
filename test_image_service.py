@@ -2,7 +2,8 @@ import json
 
 import image_service
 
-def test_jpg():
+def test_jpg(monkeypatch):
+    monkeypatch.setattr('test_image_service.image_service.upload_to_s3', lambda x, y: 1)
     event = {
         'body': json.dumps({
             'name': 'Urban Meyer',
@@ -13,7 +14,8 @@ def test_jpg():
     lambda_response = image_service.lambda_handler(event, None)
 
 
-def test_png():
+def test_png(monkeypatch):
+    monkeypatch.setattr('test_image_service.image_service.upload_to_s3', lambda x, y: 1)
     event = {
         'body': json.dumps({
             'name': 'PNG Pic',
@@ -22,10 +24,3 @@ def test_png():
         })
     }
     lambda_response = image_service.lambda_handler(event, None)
-
-
-if __name__ == "__main__":
-    print('\n\nTEST JPG\n')
-    test_jpg()
-    print('\n\nTEST PNG\n')
-    test_png()
