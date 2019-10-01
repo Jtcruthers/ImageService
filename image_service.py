@@ -7,11 +7,11 @@ from uuid import uuid4
 
 from PIL import Image
 
-THUMBNAIL_SIZE = (150, 150)
+THUMBNAIL_SIZE = (400, 400)
 STANDARD_SIZE = (2000, 2000)
 S3_BUCKET = 'drone-part-picker-jtcruthers'
 
-ImageData = namedtuple('POSTData', ['name', 'id', 'image'])
+ImageData = namedtuple('POSTData', ['name', 'image'])
 
 
 def load_image(image_url):
@@ -33,13 +33,12 @@ def parse_event(event):
     image = load_image(body['image_url'])
     return ImageData(
         name=body['name'],
-        id=body['id'],
         image=image
     )
 
 
 def create_file_name(image_data, size):
-    base_name = f'{image_data.name}_{image_data.id}_{size}.jpg'
+    base_name = f'{image_data.name}_{size}.jpg'
     return re.sub(r'\s', '_', base_name)
 
 
@@ -54,7 +53,7 @@ def upload_to_s3(file_name, file_path):
         file_path,
         S3_BUCKET,
         file_name,
-        extra_args 
+        extra_args
     )
 
 
